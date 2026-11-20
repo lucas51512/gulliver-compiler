@@ -4,6 +4,12 @@
 -- environment (the Haskell simulator, OpenQASM, Qiskit, ...). It is produced
 -- by tracing the executed path of a program, so classical control flow is
 -- already resolved and only quantum instructions remain.
+--
+-- It is therefore an /observed circuit/, not yet a /compilable program/: a
+-- branch that depends on a measurement result is recorded only for the path
+-- that was taken. Planned (not implemented) constructors for a full program IR:
+-- @IBranch ClassicalExpr IRBlock IRBlock@ and @ILoop ClassicalExpr IRBlock@.
+-- What the current IR guarantees is listed in COMPILER_ARCHITECTURE_GUIDE.md.
 module Gulliver.IR
   ( IRInstr(..)
   , IRProgram(..)

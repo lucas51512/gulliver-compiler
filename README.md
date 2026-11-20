@@ -55,7 +55,7 @@ gulliver-vscode/  VS Code extension (syntax highlighting)
 |---|---|
 | Resources | `new Qubit()`, `new QuantumRegister(n)`, `r[i]` |
 | Gates | `superposite(q)`, `bitflip(q)`, `phaseflip(q)`, `controlled(bitflip, c, t)` |
-| Entanglement intent | `entangle(c, t)` (warns when it entangles nothing) |
+| Entanglement intent | `entangle(c, t)` (warns when there is no evidence of entanglement) |
 | Measurement | `measure(q)` -> `Result`, `measure(r)` -> `Results` |
 | Distribution | `probability(measure(x))` -> `Probability` |
 | Bindings | `var` (mutable), `local`, `final`; all lexically scoped with `in` |

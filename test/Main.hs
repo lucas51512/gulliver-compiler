@@ -173,6 +173,18 @@ tests =
         Right hist -> length hist == 2 && sum (map snd hist) == 200
         Left _ -> False
 
+  -- statistical checks over many shots
+  , check "Bell shots: only 00/11, roughly balanced" $
+      case shotsOf 400 7 "quantum fn f() -> Results { local r: QuantumRegister = new QuantumRegister(2) in superposite(r[0]); entangle(r[0], r[1]); measure(r) }\nf()" of
+        Just h -> all ((`elem` ["00", "11"]) . fst) h && all (\(_, n) -> n > 140 && n < 260) h
+        Nothing -> False
+  , check "interference shots: H Z H is always 1, H H always 0" $
+      shotsOf 50 1 (wrap "local q: Qubit = new Qubit() in superposite(q); phaseflip(q); superposite(q); measure(q)") == Just [("1", 50)]
+        && shotsOf 50 1 (wrap "local q: Qubit = new Qubit() in superposite(q); superposite(q); measure(q)") == Just [("0", 50)]
+  , check "probability does not collapse: IR holds IProbe, no IMeasure" $
+      let is = irInstrs (rrIR (runSeed 1 "quantum fn f() -> Probability { local q: Qubit = new Qubit() in superposite(q); probability(measure(q)) }\nf()"))
+      in any isProbe is && not (any isMeasure is)
+
   -- entangle semantics
   , check "entangle on a |0> control warns that nothing was entangled" $
       not . null . rrWarnings $ runSeed 1 "quantum fn f() -> Results { local r: QuantumRegister = new QuantumRegister(2) in entangle(r[0], r[1]); measure(r) }\nf()"
@@ -212,6 +224,13 @@ tests =
   ]
   where
     value' s = rrValue (runSeed s bell)
+
+shotsOf :: Int -> Int -> String -> Maybe [(String, Int)]
+shotsOf n seed src = either (const Nothing) Just (runShots n seed (parseOk src))
+
+isProbe, isMeasure :: IRInstr -> Bool
+isProbe i = case i of { IProbe _ _ -> True; _ -> False }
+isMeasure i = case i of { IMeasure _ _ -> True; _ -> False }
 
 bell :: String
 bell = "quantum fn f() -> (Result, Result) { local q: QuantumRegister = new QuantumRegister(2) in superposite(q[0]); entangle(q[0], q[1]); local a: Result = measure(q[0]) in local b: Result = measure(q[1]) in (a, b) }\nf()"

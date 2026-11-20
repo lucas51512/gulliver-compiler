@@ -137,7 +137,8 @@ distribution qs (QState m) =
   in filter ((> epsilon) . snd) (Map.toList acc)
 
 -- | Purity Tr(rho^2) of the reduced state of qubit k. It equals 1 exactly
--- when the qubit is not entangled with the rest of the system.
+-- when the qubit is not entangled with the rest of the system. A purity below
+-- 1 only says the qubit is entangled with /something/, not with a given qubit.
 purity :: Int -> QState -> Double
 purity k (QState m) =
   let rests = Set.toList . Set.fromList $ map (`clearBit` k) (Map.keys m)

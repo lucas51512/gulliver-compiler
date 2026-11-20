@@ -105,9 +105,10 @@ Measuring a single `r[i]` gives a `Result`.
 `entangle(c, t)` is a CNOT. A CNOT is a *physical operation*; it creates
 entanglement only if the control is in superposition and the target is changed
 by X. Applied to `|00>` it entangles nothing. So Gulliver defines `entangle` as
-an *intent* and checks it: if after the operation neither qubit is entangled
-with the rest of the system, the run prints a warning
-(`examples/entangle_intent.gll`). When you want the plain operation (for
+an *intent* and checks it with a heuristic: if after the operation both qubits
+are still in pure states, there is no entanglement between them and the run
+prints a warning (`examples/entangle_intent.gll`). No warning does not prove the
+pair is entangled (each could be entangled with a third qubit). When you want the plain operation (for
 example phase kickback in Deutsch, `examples/deutsch.gll`), write
 `controlled(bitflip, c, t)`, which never warns.
 
@@ -131,7 +132,7 @@ qubit is used safely, so `var` and `final` are rejected for `Qubit` and
 Qubits and registers are *affine resources*: they cannot be copied.
 
 * Gates **borrow**: `superposite(q); bitflip(q);` is fine.
-* `measure(q)` / `probability(measure(q))` **consume** `q`. Using it afterwards is a compile error.
+* `measure(q)` **consumes** `q` and collapses its state. `probability(measure(q))` only *queries* the exact distribution (no collapse) but also consumes `q`, by language rule, so it is never confused with a reusable measurement.
 * Binding to another name, passing to a function, and returning **move** the resource. After `local b = a`, `a` is gone.
 * A qubit cannot be pulled out of a register into a name (`local a: Qubit = r[0]` is rejected); use `r[0]` directly as an operand.
 * `entangle(q, q)` / `controlled(g, q, q)` are rejected.
@@ -186,4 +187,4 @@ Operators: `+ - * / %`, `== != < <= > >=`, `&& || !`, unary `-`.
 | `... needs two distinct qubits` | Same qubit used as control and target. |
 | `'x' is not declared with 'var'` | Assignment to a `local`/`final`. |
 | `quantum operation ... is not allowed in a classical fn` | Add `quantum` to the `fn`. |
-| `warning: entangle(...) no entanglement was produced` | The control was not in superposition. |
+| `warning: entangle(...) no evidence of entanglement` | Both operands are still pure; usually the control was not in superposition. |

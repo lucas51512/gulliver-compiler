@@ -265,8 +265,9 @@ eval expr = case expr of
     st <- gets mQuantum
     when (purity cq st > 1 - 1e-9 && purity tq st > 1 - 1e-9) $
       warn $ "entangle(qubit " ++ show cq ++ ", qubit " ++ show tq
-        ++ "): no entanglement was produced; CNOT only entangles when the control"
-        ++ " is in superposition and the target is changed by X"
+        ++ "): no evidence of entanglement between the operands (both qubits are"
+        ++ " still in pure states); CNOT only entangles when the control is in"
+        ++ " superposition and the target is changed by X"
     return VUnit
 
   Measure t -> do

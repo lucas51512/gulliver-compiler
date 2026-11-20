@@ -47,7 +47,23 @@ Dependencies are only `base`, `containers` and `mtl`.
 
 * **Quantum state** (`mQuantum`): complex amplitudes over all allocated qubits. Qubit `k` is bit `k` of the basis index; strings print qubit 0 first. Phase is preserved, so interference works.
 * **Outcome** (`VResult`, `VResults`): classical bits from `measure`. Measurement is probabilistic (Born rule) using a seeded SplitMix64 generator, and collapses the state.
-* **Probability** (`VProb`): the exact outcome distribution of a measurement, computed from the amplitudes without sampling. `probability(measure(x))` does not collapse the state, but the qubits are consumed. Probabilities are derived data; they are never used as the source of truth for quantum state.
+* **Probability** (`VProb`): the exact outcome distribution of a measurement, computed from the amplitudes without sampling. `probability(measure(x))` does not collapse the state, but the qubits are consumed (see below). Probabilities are derived data; they are never used as the source of truth for quantum state.
+
+### `measure` versus `probability(measure(...))`
+
+| | `measure(q)` | `probability(measure(q))` |
+|---|---|---|
+| Result | one sampled `Result`/`Results` | exact `Probability` (Born rule) |
+| State | collapses | **unchanged** |
+| Resource | consumed | consumed (language rule) |
+| IR | `IMeasure` | `IProbe` |
+
+Consuming `q` after `probability` is a *language* decision, not a consequence
+of quantum mechanics: it keeps the expression from being mistaken for a
+measurement whose state can still be reused. Open design question: a
+dedicated non-destructive `distribution(q)` / `inspect(q)` that borrows instead
+of consuming would avoid the misleading `measure` inside `probability`. Not
+implemented; the simulator-only meaning is also unobservable on hardware.
 
 ### Memory model
 
@@ -65,8 +81,16 @@ is |0>, which adds no basis states.
 (a CNOT). The difference is the contract: `entangle` declares intent, and the
 interpreter verifies it. After the operation it computes the purity
 `Tr(rho^2)` of the reduced state of each qubit; purity 1 means "not entangled
-with the rest". If both are pure a warning is emitted. `controlled` makes no
-such claim.
+with the rest". If both are pure, neither qubit is entangled with anything, so
+in particular not with each other, and a warning is emitted.
+
+The check is a **heuristic with one-sided evidence**. Purity 1 on both operands
+proves there is no entanglement between them. Purity below 1 proves nothing
+about the pair: a qubit may be entangled with a third qubit. So the absence of
+a warning is *not* a guarantee that `c` and `t` are entangled, and the warning
+reads "no evidence of entanglement between the operands". A stronger check
+would analyse the joint two-qubit state (and whether the global state is pure);
+that is future work. `controlled` makes no such claim.
 
 ### Bindings
 
@@ -85,7 +109,7 @@ No-cloning cannot be guaranteed by an ordinary type checker. `TypeChecker`
 threads a set of consumed resources (`Whole x` or `Elem r i`) through the
 checking and enforces an **affine** discipline:
 
-* Gates and operands borrow. `measure`, binding, passing to a function and returning move.
+* Gates and operands **borrow** (temporary use, ownership stays). Binding, passing to a function and returning **move** (ownership transfers). `measure` and `probability(measure(...))` **consume** (no use afterwards, and the state is not handed to anyone). In the checker all three end with the name in the consumed set, but they stay distinct concepts for tuples, functions that take registers and libraries.
 * Using a consumed resource is `UseAfterConsume`.
 * `r[i]` cannot be moved out of its register (`QubitAliasing`), so two handles to one qubit never exist in a name.
 * `if` merges the consumption of both branches; loops may not consume outer resources (`ConsumedInLoop`).
@@ -108,14 +132,44 @@ data IRInstr
 
 The IR is produced by *tracing the executed path*: loops are unrolled and
 function calls inlined, so only quantum instructions remain.
-**Known limitation:** classical control flow that depends on a measurement
-result is resolved on the sampled path and is not preserved as a branch in the
-IR. Representing it (dynamic circuits) is part of the IR roadmap.
+
+**Observed circuit, not compilable program.** The IR records what happened in
+one execution. For
+
+```
+local r: Result = measure(q) in
+if r then { bitflip(t); } else { phaseflip(t); }
+```
+
+only the branch taken is recorded; a backend cannot recover the other one.
+A program IR would add `IBranch ClassicalExpr IRBlock IRBlock` and
+`ILoop ClassicalExpr IRBlock` (roadmap, deliberately not implemented yet).
+
+What the IR **guarantees**: the exact sequence of quantum instructions of that
+execution, hardware independence (no QASM/Qiskit names), and that `runIR` with
+the same seed reproduces the run. What it does **not** guarantee: the logic of
+unexecuted paths, loop structure, or classical computation. Backends must read
+only the IR, so Qiskit/OpenQASM quirks (bit order, `measure` syntax) stay in
+`Backend` and never leak into the language semantics.
 `runIR` re-executes an IR program on the simulator; with the same seed it
 reproduces the original run, which is covered by the tests.
 
 OpenQASM and Qiskit turn `IProbe` into measurements: hardware estimates a
 distribution by repeating the circuit.
+
+## Identity: circuits or computations?
+
+Gulliver aims to be a language for *quantum computations*, not only circuit
+descriptions. Each feature is judged by which side it serves:
+
+| Feature | Adds |
+|---|---|
+| `superposite`, `bitflip`, `controlled` | primitive quantum operations (circuit side) |
+| `entangle` | intent abstraction |
+| `quantum fn` | composition and abstraction of programs |
+| `Probability` | interface between quantum state and classical information |
+| program IR (branches/loops) | result-dependent control flow |
+| oracles, amplification (removed stubs; may return) | higher-level algorithmic abstractions |
 
 ## Adding things
 
@@ -129,7 +183,7 @@ surface keyword in `Parser.gateKeywords` if it needs one.
 ## Testing
 
 `test/Main.hs` is a dependency-free executable test suite (`cabal test`). It
-covers lexing, parsing, type and resource errors, interference and phase,
+covers numeric checks (amplitudes, exact distributions), statistical checks over many shots (Bell, GHZ, interference, Deutsch), lexing, parsing, type and resource errors, interference and phase,
 entanglement correlation, probabilities, the `entangle` warning, IR
 consistency, backends, and runs every file in `examples/`.
 
