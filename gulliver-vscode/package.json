@@ -1,0 +1,25 @@
+{
+  "name": "gulliver",
+  "displayName": "Gulliver",
+  "version": "0.0.1",
+  "publisher": "local",
+  "engines": { "vscode": "^1.60.0" },
+  "categories": ["Programming Languages"],
+  "contributes": {
+    "languages": [
+      {
+        "id": "gulliver",
+        "aliases": ["Gulliver", "gulliver"],
+        "extensions": [".gll"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "gulliver",
+        "scopeName": "source.gulliver",
+        "path": "./syntaxes/gulliver.tmLanguage.json"
+      }
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+// Example 1: Bell state (entanglement)
+// Creates (|00> + |11>) / sqrt(2) and measures both qubits.
+
+quantum fn bell_pair() -> (Result, Result) {
+    local q: QuantumRegister = new QuantumRegister(2) in
+
+    superposite(q[0]);              // q[0] becomes (|0> + |1>) / sqrt(2)
+    entangle(q[0], q[1]);           // CNOT: with q[0] in superposition this entangles the pair
+
+    local r0: Result = measure(q[0]) in
+    local r1: Result = measure(q[1]) in
+
+    return (r0, r1);                // always (0,0) or (1,1)
+}
+
+// Expected: 50% (0, 0) and 50% (1, 1); the two results always agree.
+// Try: gulliver-cli examples/bell_state.gll --shots 100

@@ -1,0 +1,48 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Gulliver: Run current file",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/gulliver-cli",
+      "args": ["${file}"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "name": "Gulliver: Build",
+      "type": "shell",
+      "command": "cabal",
+      "args": ["build"],
+      "problemMatcher": "$haskell",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always"
+      }
+    },
+    {
+      "name": "Gulliver: Test",
+      "type": "shell",
+      "command": "cabal",
+      "args": ["test"],
+      "problemMatcher": "$haskell",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always"
+      }
+    }
+  ]
+}

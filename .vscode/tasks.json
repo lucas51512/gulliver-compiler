@@ -1,0 +1,82 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build Gulliver",
+      "type": "shell",
+      "command": "cabal",
+      "args": ["build"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always"
+      },
+      "problemMatcher": "$haskell"
+    },
+    {
+      "label": "Run Tests",
+      "type": "shell",
+      "command": "cabal",
+      "args": ["test"],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always"
+      },
+      "problemMatcher": "$haskell"
+    },
+    {
+      "label": "Run Example: Bell State",
+      "type": "shell",
+      "command": "cabal",
+      "args": ["exec", "gulliver-cli", "--", "examples/bell_state.gll"],
+      "presentation": {
+        "reveal": "always"
+      },
+      "group": "build"
+    },
+    {
+      "label": "Run Example: GHZ State",
+      "type": "shell",
+      "command": "cabal",
+      "args": ["exec", "gulliver-cli", "--", "examples/ghz_state.gll"],
+      "presentation": {
+        "reveal": "always"
+      },
+      "group": "build"
+    },
+    {
+      "label": "Run Example: Superposition",
+      "type": "shell",
+      "command": "cabal",
+      "args": ["exec", "gulliver-cli", "--", "examples/superposition.gll"],
+      "presentation": {
+        "reveal": "always"
+      },
+      "group": "build"
+    },
+    {
+      "label": "Run Example: Variable Scopes",
+      "type": "shell",
+      "command": "cabal",
+      "args": ["exec", "gulliver-cli", "--", "examples/variable_scopes.gll"],
+      "presentation": {
+        "reveal": "always"
+      },
+      "group": "build"
+    },
+    {
+      "label": "Clean Build",
+      "type": "shell",
+      "command": "cabal",
+      "args": ["clean"],
+      "presentation": {
+        "reveal": "always"
+      }
+    }
+  ]
+}

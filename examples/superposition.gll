@@ -1,0 +1,9 @@
+// Example 3: Superposition
+// A quantum state is not a bag of probabilities: it holds complex amplitudes.
+
+quantum fn superposition_example() -> QuantumRegister {
+    local q: QuantumRegister = new QuantumRegister(1) in
+
+    superposite(q);                 // |0> becomes (|0> + |1>) / sqrt(2)
+    return q;                       // the amplitudes are printed with the result
+}

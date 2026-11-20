@@ -1,0 +1,24 @@
+// Example 7: Variable scopes
+//
+// All three forms are lexically scoped ("... in body"):
+//   var    mutable classical binding; reassign with  x := ...
+//   local  immutable binding (the default); the only form allowed for qubits
+//   final  immutable classical constant
+// "final" is about classical immutability only. It says nothing about the
+// safety of a qubit, which is checked by the resource rules instead
+// (no cloning, no use after measurement), so `final q: Qubit` is rejected.
+
+quantum fn flip_and_count(n: Int) -> Int {
+    var ones: Int = 0 in
+    final shots: Int = n in
+
+    for i in 1..shots {
+        local q: Qubit = new Qubit() in
+        bitflip(q);
+        measure(q);                 // the qubit is consumed here
+        ones := ones + 1;
+    }
+    ones
+}
+
+flip_and_count(5)                   // 5

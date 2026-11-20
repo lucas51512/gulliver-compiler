@@ -1,0 +1,49 @@
+cabal-version:      2.4
+name:               gulliver
+version:            0.2.0.0
+synopsis:           Quantum Programming Language Compiler in Haskell
+license:            MIT
+author:             Gulliver Team
+build-type:         Simple
+
+common warnings
+    ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns
+
+library
+    import:           warnings
+    exposed-modules:
+        Gulliver.Lexer
+        Gulliver.Parser
+        Gulliver.AST
+        Gulliver.TypeChecker
+        Gulliver.IR
+        Gulliver.Simulator
+        Gulliver.Interpreter
+        Gulliver.Backend
+    build-depends:
+        base >=4.14 && <5,
+        containers,
+        mtl >= 2.2
+    hs-source-dirs:   src
+    default-language: Haskell2010
+
+executable gulliver-cli
+    import:           warnings
+    main-is:          Main.hs
+    build-depends:
+        base >=4.14 && <5,
+        gulliver,
+        containers
+    hs-source-dirs:   app
+    default-language: Haskell2010
+
+test-suite gulliver-test
+    import:           warnings
+    type:             exitcode-stdio-1.0
+    main-is:          Main.hs
+    build-depends:
+        base >=4.14 && <5,
+        gulliver,
+        containers
+    hs-source-dirs:   test
+    default-language: Haskell2010

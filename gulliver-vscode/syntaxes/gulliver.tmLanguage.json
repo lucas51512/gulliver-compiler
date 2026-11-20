@@ -1,0 +1,132 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Gulliver",
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#strings" },
+    { "include": "#numbers" },
+    { "include": "#keywords" },
+    { "include": "#types" },
+    { "include": "#gates" },
+    { "include": "#variables" },
+    { "include": "#operators" },
+    { "include": "#punctuation" }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.double-slash.gulliver",
+          "begin": "//",
+          "end": "$",
+          "patterns": []
+        },
+        {
+          "name": "comment.block.gulliver",
+          "begin": "/\\*",
+          "end": "\\*/",
+          "patterns": []
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.gulliver",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.gulliver",
+              "match": "\\\\."
+            }
+          ]
+        },
+        {
+          "name": "string.quoted.single.gulliver",
+          "begin": "'",
+          "end": "'",
+          "patterns": [
+            {
+              "name": "constant.character.escape.gulliver",
+              "match": "\\\\."
+            }
+          ]
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.float.gulliver",
+          "match": "\\b\\d+\\.\\d+([eE][+-]?\\d+)?\\b"
+        },
+        {
+          "name": "constant.numeric.integer.gulliver",
+          "match": "\\b\\d+\\b"
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.gulliver",
+          "match": "\\b(if|then|else|while|for|return)\\b"
+        },
+        {
+          "name": "keyword.declaration.gulliver",
+          "match": "\\b(quantum|fn|var|local|final|let|in|new)\\b"
+        },
+        {
+          "name": "constant.language.boolean.gulliver",
+          "match": "\\b(true|false)\\b"
+        }
+      ]
+    },
+    "types": {
+      "patterns": [
+        {
+          "name": "support.type.gulliver",
+          "match": "\\b(Qubit|QuantumRegister|Results|Result|Probability|Unit|Int|Bool)\\b"
+        }
+      ]
+    },
+    "gates": {
+      "patterns": [
+        {
+          "name": "support.function.gate.gulliver",
+          "match": "\\b(superposite|bitflip|phaseflip|entangle|controlled|H|X|Y|Z|CNOT)\\s*(?=\\()"
+        },
+        {
+          "name": "support.function.measurement.gulliver",
+          "match": "\\b(measure|probability)\\s*(?=\\()"
+        }
+      ]
+    },
+    "variables": {
+      "patterns": [
+        {
+          "name": "variable.other.gulliver",
+          "match": "\\b[a-zA-Z_$][a-zA-Z0-9_$]*\\b"
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "name": "keyword.operator.gulliver",
+          "match": "(->|:=|==|!=|<=|>=|&&|\\|\\||\\.\\.|=|<|>|\\+|-|\\*|/|%|!)"
+        }
+      ]
+    },
+    "punctuation": {
+      "patterns": [
+        {
+          "name": "punctuation.gulliver",
+          "match": "[{}\\[\\]().,;:]"
+        }
+      ]
+    }
+  },
+  "scopeName": "source.gulliver"
+}

@@ -1,0 +1,18 @@
+// Example 2: GHZ state, (|00...0> + |11...1>) / sqrt(2)
+
+quantum fn ghz_state(n: Int) -> QuantumRegister {
+    local reg: QuantumRegister = new QuantumRegister(n) in
+
+    superposite(reg[0]);
+    for i in 0..n-2 {                       // the upper bound is inclusive
+        entangle(reg[i], reg[i+1]);         // chain of entangling operations
+    }
+    return reg;                             // ownership of the register moves to the caller
+}
+
+quantum fn ghz_measured() -> Results {
+    local reg: QuantumRegister = ghz_state(3) in
+    measure(reg)                            // measuring a register yields a bit string
+}
+
+// Expected: "000" or "111", each with 50%.

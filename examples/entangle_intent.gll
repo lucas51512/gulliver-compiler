@@ -1,0 +1,13 @@
+// Example 8: entangle() states an intent
+//
+// entangle(c, t) applies a CNOT. A CNOT only produces entanglement when the
+// control is in superposition. Gulliver reports a warning when entangle()
+// ends up producing none.
+
+quantum fn no_entanglement() -> Results {
+    local q: QuantumRegister = new QuantumRegister(2) in
+    entangle(q[0], q[1]);           // control is |0>: nothing is entangled
+    measure(q)
+}
+
+no_entanglement()

@@ -1,0 +1,37 @@
+// Example 6: Deutsch algorithm
+// Decides whether f: {0,1} -> {0,1} is constant or balanced with a single
+// oracle call. Result 0 = constant, 1 = balanced.
+//
+// controlled(bitflip, x, y) is the oracle for f(x) = x (balanced). Here it
+// is used for phase kickback, not to create entanglement, which is exactly
+// why Gulliver also offers controlled(...) next to entangle(...).
+
+quantum fn deutsch_constant() -> Result {
+    local x: Qubit = new Qubit() in
+    local y: Qubit = new Qubit() in
+
+    bitflip(y);                     // y = |1>
+    superposite(x);
+    superposite(y);                 // x = |+>, y = |->
+
+    // oracle for f(x) = 0: does nothing
+
+    superposite(x);
+    measure(x)
+}
+
+quantum fn deutsch_balanced() -> Result {
+    local x: Qubit = new Qubit() in
+    local y: Qubit = new Qubit() in
+
+    bitflip(y);
+    superposite(x);
+    superposite(y);
+
+    controlled(bitflip, x, y);      // oracle for f(x) = x
+
+    superposite(x);
+    measure(x)
+}
+
+(deutsch_constant(), deutsch_balanced())     // always (0, 1)

@@ -1,0 +1,24 @@
+// Example 4: Coin flip and the Probability type
+//
+// measure(q)             -> Result: one random classical bit; q is consumed.
+// probability(measure(q)) -> Probability: the exact distribution of that
+//                            measurement, computed from the amplitudes.
+
+quantum fn coin_flip() -> Probability {
+    local q: Qubit = new Qubit() in
+
+    superposite(q);
+
+    probability(measure(q))
+}
+
+quantum fn coin_toss() -> Result {
+    local q: Qubit = new Qubit() in
+
+    superposite(q);
+
+    measure(q)
+}
+
+(coin_toss(), coin_flip())          // e.g. (1, {0: 50.00%, 1: 50.00%})
+// Use --shots N to see the statistics of the sampled part.

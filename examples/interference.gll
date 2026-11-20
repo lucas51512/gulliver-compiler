@@ -1,0 +1,23 @@
+// Example 5: Phase matters (interference)
+//
+// Z only changes the phase of |1>, so applying it to |0> changes nothing
+// measurable. Sandwiched between two Hadamards it flips the outcome, because
+// the two paths to |0> interfere destructively. A model that stores only
+// probabilities cannot reproduce this.
+
+quantum fn without_phase() -> Result {
+    local q: Qubit = new Qubit() in
+    superposite(q);
+    superposite(q);                 // H H = identity
+    measure(q)                      // always 0
+}
+
+quantum fn with_phase() -> Result {
+    local q: Qubit = new Qubit() in
+    superposite(q);
+    phaseflip(q);                   // phase of |1> becomes negative
+    superposite(q);                 // H Z H = X
+    measure(q)                      // always 1
+}
+
+(without_phase(), with_phase())
